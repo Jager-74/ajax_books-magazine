@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Jager
@@ -9,24 +8,6 @@
 
 class Books
 {
-    public  $isdn;
-    public  $author;
-    public  $title;
-    public  $catid;
-    public  $price;
-    public  $description;
-
-    //private $db;// = new PDO('mysql:host=localhost;dbname=s1',"admin","admin");
-
-    function __construct($isdn,$author,$title,$catid,$price,$description) {
-        $this->isdn = $isdn;
-        $this->author = $author;
-        $this->title = $title;
-        $this->catid = $catid;
-        $this->price = $price;
-        $this->description = $description;
-    }
-
     /**
      * @param $isbn
      * @return mixed
@@ -34,8 +15,11 @@ class Books
     public static function getBook($isbn)
     {
         $mysqli = Books::dbConnect();
-        $res = $mysqli->query("SELECT * FROM books WHERE isbn = " . $isbn);
-        return $res;
+        $res = $mysqli->query("SELECT * FROM `books` WHERE `isbn` = '".$isbn."' LIMIT 1");
+        while($row = $res->fetch_assoc() ){
+            $result[] = $row;
+        }
+        return $result[0];
     }
 
     /**

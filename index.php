@@ -6,9 +6,7 @@
  * Time: 12:40
  */
 error_reporting(-1);
-require_once ("Books.php");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +18,10 @@ require_once ("Books.php");
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 </head>
+<?php
+require_once ("Books.php");
+require_once ("_ajax.php");
+?>
 <body>
 <div class="container" style="margin-top:5%;">
     <div class="row">
@@ -31,10 +33,10 @@ require_once ("Books.php");
                 </tr>
             </thead>
             <tfoot>
-            ISBN - unique. Category&Price - number,other - text.
+            <p>ISBN - unique, type=string. Category&Price - number, type=float. Other - string.</p>
             </tfoot>
             <tbody id="res">
-                <?php require_once ("_ajax.php")?>
+                <?php table();?>
             </tbody>
         </table>
         <a class="btn btn-default pull-right" href="#myModal" data-toggle="modal" role="button">Add book</a>
@@ -114,10 +116,11 @@ require_once ("Books.php");
                 <h4 class="modal-title">Edit book</h4>
             </div>
             <div class="modal-body">
+                <script>console.log()</script>
                 <form class="form-horizontal">
                     <div class="form-group">
                         <label class="col-xs-2 control-label" for="isbn">ISBN</label>
-                        <div class=" col-xs-9"><input type="text" class="form-control" id="isbn" placeholder="ISBN"></div>
+                        <div class=" col-xs-9"><input type="text" class="form-control" id="isbn" placeholder="ISBN" disabled="disabled"></div>
                     </div>
                     <div class="form-group">
                         <label class="col-xs-2 control-label" for="author">Author</label>
@@ -129,7 +132,7 @@ require_once ("Books.php");
                     </div>
                     <div class="form-group">
                         <label class="col-xs-2 control-label" for="catid">Category</label>
-                        <div class=" col-xs-9"><input type="number" class="form-control" id="catid" placeholder="Category"></div>
+                        <div class=" col-xs-9"><input type="number" class="form-control" id="catid" placeholder="Ctegiry"></div>
                     </div>
                     <div class="form-group">
                         <label class="col-xs-2 control-label" for="price">Price</label>
@@ -151,6 +154,108 @@ require_once ("Books.php");
 </div>
 </body>
 </html>
+<script>
+    $(function(){
+        var del_book;
+        var arr_book = false;
+
+        $('#submit_add').click(function() {
+            var isbn = $('#isbn').val();
+            var author = $('#author').val();
+            var title = $('#title').val();
+            var catid = $('#catid').val();
+            var price = $('#price').val();
+            var desc = $('#desc').val();
+            $.ajax({
+                url: '/_ajax.php',
+                type: "POST",
+                dataType: "html",
+                data:{post_id:'add',isbn:isbn, author:author,title:title,catid:catid,price:price,desc:desc},
+                success: function(data) {
+                    $('#res').html(data);
+                    $('#myModal').modal('hide');
+                }
+            });
+        });
+
+        $('body').delegate('.submit_del','click',function() {
+            del_book = $(this).attr('data-isbn');
+            console.log(del_book);
+        });
+
+        $('#submit_del').click(function() {
+            console.log(del_book);
+            $.ajax({
+                url: '/_ajax.php',
+                type: "POST",
+                dataType: "html",
+                data:{post_id:'del',isbn:del_book},
+                success: function(data) {
+                    $('#res').html(data);
+                    del_book = false;
+                    $('#myModalDelete').modal('hide');
+                }
+            });
+        });
+
+        $('.submit_edit').click(function() {
+            var edit_book = $(this).attr('data-isbn');
+            $.ajax({
+                url: '/_ajax.php',
+                type: "POST",
+                dataType: "json",
+                data:{post_id:'edit',isbn:edit_book},
+                success: function(data) {
+                    arr_book = data;
+                    //var arr = JSON.parse(data);
+                    console.log(arr_book);
+                    $('#myModalEdit #isbn').attr('value',arr_book['isbn']);
+                    $('#myModalEdit #author').attr('value',arr_book['author']);
+                    $('#myModalEdit #title').attr('value',arr_book['title']);
+                    $('#myModalEdit #catid').attr('value',arr_book['catid']);
+                    $('#myModalEdit #price').attr('value',arr_book['price']);
+                    $('#myModalEdit #desc').attr('value',arr_book['description']);
+                    //$('#res').html(data);
+                    //$('#myModalEdit').modal('hide');
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.statusText);
+                    alert(xhr.responseText);
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+        });
+
+        $('#submit_edit').click(function() {
+            var isbn = $('#myModalEdit #isbn').attr('value');
+            var author = $('#myModalEdit #author').val();
+            var title = $('#myModalEdit #title').val();
+            var catid = $('#myModalEdit #catid').val();
+            var price = $('#myModalEdit #price').val();
+            var desc = $('#myModalEdit #desc').val();
+            $.ajax({
+                url: '/_ajax.php',
+                type: "POST",
+                //dataType: "json",
+                data:{post_id:'save',isbn:isbn,author:author,title:title,catid:catid,price:price,decs:desc},
+                success: function(data) {
+                    //var arr = JSON.parse(data);
+                    //alert(data);
+                    //$('#myModalEdit .modal-body').html(data);
+                    //$('#res').html(data);
+                    $('#myModalEdit').modal('hide');
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.statusText);
+                    alert(xhr.responseText);
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+        });
+    });
+</script>
 
 
 
