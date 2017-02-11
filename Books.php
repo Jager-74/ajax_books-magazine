@@ -35,11 +35,11 @@ class Books
     /**
      * @return mixed
      */
-    public static function addBook($isdn,$author,$title,$catid,$price,$description)
+    public static function addBook($isbn,$author,$title,$catid,$price,$description)
     {
         $mysqli = Books::dbConnect();
         //$res = ;
-        $q = "INSERT INTO `books` (`isbn`,`author`,`title`,`catid`,`price`,`description`) VALUES ('".$isdn."','".$author."','".$title."','".$catid."','".$price."','".$description."')";
+        $q = "INSERT INTO `books` (`isbn`,`author`,`title`,`catid`,`price`,`description`) VALUES ('".$isbn."','".$author."','".$title."','".$catid."','".$price."','".$description."')";
         if(!$mysqli->query($q)){
             return "Ошибка добавления: (" . $mysqli->errno . ") " . $mysqli->error;
         }
@@ -52,6 +52,16 @@ class Books
         $mysqli = Books::dbConnect();
         //$res = ;
         $q = "DELETE FROM `books` WHERE `isbn` = '".$isdn."'";
+        if(!$mysqli->query($q)){
+            return "Ошибка добавления: (" . $mysqli->errno . ") " . $mysqli->error;
+        }
+    }
+
+    public static function updBook($isbn,$author,$title,$catid,$price,$desc)
+    {
+        $mysqli = Books::dbConnect();
+        //$res = ;
+        $q = "UPDATE `books` SET `author`='".$author."',`title`='".$title."',`catid`=".$catid.",`price`=".$price.",`description`='".$desc."'  WHERE `isbn` = '".$isbn."' LIMIT 1";
         if(!$mysqli->query($q)){
             return "Ошибка добавления: (" . $mysqli->errno . ") " . $mysqli->error;
         }

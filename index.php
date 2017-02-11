@@ -6,6 +6,8 @@
  * Time: 12:40
  */
 error_reporting(-1);
+require_once ("Books.php");
+require_once ("_ajax.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,22 +21,18 @@ error_reporting(-1);
 
 </head>
 <?php
-require_once ("Books.php");
-require_once ("_ajax.php");
+
 ?>
 <body>
 <div class="container" style="margin-top:5%;">
     <div class="row">
         <table class="table table-condensed">
-            <caption>Books table</caption>
+            <caption>ISBN - unique, type=string. Category&Price - number, type=float. Other - string.</caption>
             <thead>
                 <tr class="success">
                     <th>ISBN</th><th>Author</th><th>Title</th><th>Category</th><th>Price</th><th>Description</th><th>Delete</th><th>Edit</th>
                 </tr>
             </thead>
-            <tfoot>
-            <p>ISBN - unique, type=string. Category&Price - number, type=float. Other - string.</p>
-            </tfoot>
             <tbody id="res">
                 <?php table();?>
             </tbody>
@@ -117,7 +115,7 @@ require_once ("_ajax.php");
             </div>
             <div class="modal-body">
                 <script>console.log()</script>
-                <form class="form-horizontal">
+                <form class="form-horizontal save">
                     <div class="form-group">
                         <label class="col-xs-2 control-label" for="isbn">ISBN</label>
                         <div class=" col-xs-9"><input type="text" class="form-control" id="isbn" placeholder="ISBN" disabled="disabled"></div>
@@ -198,7 +196,7 @@ require_once ("_ajax.php");
             });
         });
 
-        $('.submit_edit').click(function() {
+        $('body').delegate('.submit_edit','click',function() {
             var edit_book = $(this).attr('data-isbn');
             $.ajax({
                 url: '/_ajax.php',
@@ -206,6 +204,7 @@ require_once ("_ajax.php");
                 dataType: "json",
                 data:{post_id:'edit',isbn:edit_book},
                 success: function(data) {
+                    //$('.save').reset();
                     arr_book = data;
                     //var arr = JSON.parse(data);
                     console.log(arr_book);
@@ -215,6 +214,7 @@ require_once ("_ajax.php");
                     $('#myModalEdit #catid').attr('value',arr_book['catid']);
                     $('#myModalEdit #price').attr('value',arr_book['price']);
                     $('#myModalEdit #desc').attr('value',arr_book['description']);
+
                     //$('#res').html(data);
                     //$('#myModalEdit').modal('hide');
                 },
@@ -237,13 +237,11 @@ require_once ("_ajax.php");
             $.ajax({
                 url: '/_ajax.php',
                 type: "POST",
-                //dataType: "json",
-                data:{post_id:'save',isbn:isbn,author:author,title:title,catid:catid,price:price,decs:desc},
+                data:{post_id:'save',isbn:isbn,author:author,title:title,catid:catid,price:price,desc:desc},
                 success: function(data) {
-                    //var arr = JSON.parse(data);
-                    //alert(data);
-                    //$('#myModalEdit .modal-body').html(data);
-                    //$('#res').html(data);
+                    $('.save')[0].reset();
+                    $('#res').html(data);
+
                     $('#myModalEdit').modal('hide');
                 },
                 error: function (xhr, ajaxOptions, thrownError) {

@@ -31,9 +31,8 @@ if($_POST['post_id'] == 'edit'){
 
 if($_POST['post_id'] == 'save'){
     try{
-        //$el = Books::getBook($_POST['isbn']);
-        //$elj = json_encode($el);
-        echo $_POST['author'];
+        Books::updBook($_POST['isbn'],$_POST['author'],$_POST['title'],$_POST['catid'],$_POST['price'],$_POST['desc']);
+        table();
     }catch(Exception $e){
         echo "Error: ". $e;
     }
